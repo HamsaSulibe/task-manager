@@ -1,5 +1,6 @@
 import json
 import logging
+import textwrap
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 class Task:
     def __init__(self, title: str, due_date: str, status="Pending") -> None:
@@ -76,37 +77,43 @@ def main() -> None:
     user.load_task()
 
     while True:
-        print("\n1. Add Task")
-        print("2. List Tasks")
-        print("3. Complete Task")
-        print("4. Delete Task")
-        print("5. Save & Exit")
+        menu = textwrap.dedent("""\
+    1. Add Task
+    2. List Tasks
+    3. Complete Task
+    4. Delete Task
+    5. Save & Exit
+                    """)
+        print(menu)
+        try:
+            choice = int(input("Choose an option: "))
+        except ValueError:
+            logging.warning("Invalid input. Please enter a number.")
+            continue
 
-        choice = input("Choose an option: ")
-
-        if choice == "1":
+        if choice == 1:
             title = input("Enter task title: ")
             due_date = input("Enter due date: ")
             user.add_task(title, due_date)
 
-        elif choice == "2":
+        elif choice == 2:
             user.list_task()
 
-        elif choice == "3":
+        elif choice == 3:
             try:
                 number = int(input("Enter task number to mark complete: "))
                 user.complete_task(number)
             except ValueError:
                 logging.error("Please enter a valid number.")
 
-        elif choice == "4":
+        elif choice == 4:
             try:
                 number = int(input("Enter task number to delete: "))
                 user.delete_task(number)
             except ValueError:
                 logging.error("Please enter a valid number.")
 
-        elif choice == "5":
+        elif choice == 5:
             user.save_task()
             logging.info("Goodbye!")
             break

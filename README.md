@@ -14,7 +14,7 @@ Tasks are stored in a JSON file so they can be saved and reloaded between sessio
 - Delete a task
 - Save and load tasks from a JSON file
 
----
+
 
 ## How to Run
 
@@ -25,7 +25,7 @@ Tasks are stored in a JSON file so they can be saved and reloaded between sessio
 python Task.py
 ````
 
----
+
 
 ## Example Usage
 
@@ -48,7 +48,7 @@ Enter task number to mark complete: 1
 INFO: Task 1 marked as complete.
 ```
 
----
+
 
 ## Code Structure
 
@@ -111,7 +111,7 @@ This is the entry point of the application. It:
 * Handles user input and calls the appropriate methods
 * Saves the task list and exits when the user chooses
 
----
+
 
 ## File Structure
 
@@ -121,12 +121,12 @@ tasks.json          # Auto-generated file to store tasks persistently
 README.md           # Documentation file 
 ```
 
----
+
 
 ## Logging and Output
 
-The program uses the built-in `logging` module to print info, warnings, and error messages instead of raw print statements.
+The program uses the built-in `logging` module to print info, warnings, and error messages .
 
 This makes the feedback more consistent and easier to follow.
 
----
+

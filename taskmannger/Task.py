@@ -163,7 +163,9 @@ def main() -> None:
         """)
         print(menu)
         try:
-            choice = int(input("Choose an option: "))
+            raw  =input("Choose an option: ")
+            cleaned=raw.strip().replace('"','').replace("'","") # Remove spaces and quotes from input
+            choice = int(cleaned)#convared to int 
         except ValueError:
             logging.warning("Invalid input. Please enter a number.")
             continue

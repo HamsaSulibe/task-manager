@@ -1,117 +1,203 @@
 import json
+import logging
+import textwrap
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
 
 class Task:
-    def __init__(self, title, due_date, status="Pending"):
+    """
+    Represents a task with a title, due date, and status.
+
+    Attributes:
+        title (str): The title of the task.
+        due_date (str): The due date of the task.
+        status (str): The status of the task (default is "Pending").
+    """
+
+    def __init__(self, title: str, due_date: str, status="Pending") -> None:
+        """
+        Initializes a new Task instance.
+
+        Args:
+            title (str): The task title.
+            due_date (str): The due date for the task.
+            status (str, optional): The task status. Defaults to "Pending".
+        """
         self.title = title
         self.due_date = due_date
         self.status = status
-#save them as a dict to save it in json file
-    def task_look(self):
+
+    def task_look(self) -> dict[str, str]:
+        """
+        Returns a dictionary representation of the task (for JSON saving).
+
+        Returns:
+            dict[str, str]: A dictionary containing task details.
+        """
         return {
             "title": self.title,
             "due_date": self.due_date,
             "status": self.status
         }
-#this is method to show the task from json file 
-    @classmethod # to creat obj from json 
-    def from_json(cls, data):
+
+    @classmethod
+    def from_json(cls, data: dict[str, str]) -> "Task":
+        """
+        Creates a Task object from a dictionary (used for loading from JSON).
+
+        Args:
+            data (dict[str, str]): The dictionary with task data.
+
+        Returns:
+            Task: A Task instance.
+        """
         return cls(data["title"], data["due_date"], data["status"])
 
-##class TaskManager to include the  tasks options:
+
 class TaskManager:
+    """
+    Manages a list of tasks and provides methods to add, delete, list, complete, save, and load tasks.
+    """
+
     def __init__(self):
-        self.tasks = [] #list
-#add task:
-    def add_ta(self, title, due_date):
+        """
+        Initializes the TaskManager with an empty task list.
+        """
+        self.tasks = []
+
+    def add_task(self, title: str, due_date: str) -> None:
+        """
+        Adds a new task to the list.
+
+        Args:
+            title (str): The task title.
+            due_date (str): The due date for the task.
+        """
         task = Task(title, due_date)
         self.tasks.append(task)
-        print(f"Task added: {title}")
-#delete task:
-    def del_ta(self, task_number):
+        logging.info(f"Task added: {title}")
+
+    def delete_task(self, task_number: int) -> None:
+        """
+        Deletes a task from the list by its number.
+
+        Args:
+            task_number (int): The number of the task to delete.
+        """
         index = task_number - 1
-        if 0 <= index < len(self.tasks): #to make sure that index in list
+        if 0 <= index < len(self.tasks):
             removed = self.tasks.pop(index)
-            print(f"Deleted: {removed.title}")
+            logging.info(f"Deleted task {task_number}: {removed.title}")
         else:
-            print("Invalid task number.")
-#list (see all task)
-    def list_ta(self):
+            logging.error("Invalid task number.")
+
+    def list_task(self) -> None:
+        """
+        Lists all current tasks with their status and due dates.
+        """
         if not self.tasks:
-            print("No tasks found.")
+            logging.info("No tasks found.")
         else:
             for i, task in enumerate(self.tasks, 1):
-                print(f"{i}. {task.title} | Due: {task.due_date} | Status: {task.status}")
-                
-#complete its mean to change it done task
-    def comp_ta(self, task_number):
-        index = task_number - 1
-        if 0 <= index < len(self.tasks): #if statment to make sure that the task valid
-            self.tasks[index].status = "Done"
-            print("Task marked as complete.")
-        else:
-            print("Invalid task number.")
+                logging.info(f"{i}. {task.title} | Due: {task.due_date} | Status: {task.status}")
 
-#working with files : 
-# save data in json file using dump 
-    def save_ta(self, filename="tasks.json"):
+    def complete_task(self, task_number: int) -> None:
+        """
+        Marks a task as complete.
+
+        Args:
+            task_number (int): The number of the task to mark as done.
+        """
+        index = task_number - 1
+        if 0 <= index < len(self.tasks):
+            self.tasks[index].status = "Done"
+            logging.info(f"Task {task_number} marked as complete.")
+        else:
+            logging.error("Invalid task number.")
+
+    def save_task(self, filename: str = "tasks.json") -> None:
+        """
+        Saves all tasks to a JSON file.
+
+        Args:
+            filename (str, optional): The name of the file to save. Defaults to "tasks.json".
+        """
         with open(filename, "w") as file:
             json.dump([task.task_look() for task in self.tasks], file)
-        print("Tasks saved successfully.")
+        logging.info("Tasks saved successfully.")
 
-#read file using load 
-    def load_ta(self, filename="tasks.json"):
+    def load_task(self, filename: str = "tasks.json") -> None:
+        """
+        Loads tasks from a JSON file if it exists.
+
+        Args:
+            filename (str, optional): The name of the file to load. Defaults to "tasks.json".
+        """
         try:
             with open(filename, "r") as file:
-                data = json.load(file)# here is how to read from json
-                self.tasks = [Task.from_json(task) for task in data] #to ta7wel  dict data to obj task to put it in self.tasks (list)
+                data = json.load(file)
+                self.tasks = [Task.from_json(task) for task in data]
         except FileNotFoundError:
-            self.tasks = [] # if jsonfile 1empty
-        except json.JSONDecodeError:# if json is wrong 
-            print("Error: Couldn't load tasks.")
+            self.tasks = []
+            logging.warning("No existing task file found. Starting with empty list.")
+        except json.JSONDecodeError:
+            logging.error("Error: Couldn't load tasks.")
 
-##main
-def main():
+
+def main() -> None:
+    """
+    Main function to run the CLI task manager application.
+    Displays menu options and handles user input in a loop.
+    """
     user = TaskManager()
-    user.load_ta()
+    user.load_task()
 
     while True:
-        print("\n1. Add Task")
-        print("2. List Tasks")
-        print("3. Complete Task")
-        print("4. Delete Task")
-        print("5. Save & Exit")
+        menu = textwrap.dedent("""\
+        1. Add Task
+        2. List Tasks
+        3. Complete Task
+        4. Delete Task
+        5. Save & Exit
+        """)
+        print(menu)
+        try:
+            choice = int(input("Choose an option: "))
+        except ValueError:
+            logging.warning("Invalid input. Please enter a number.")
+            continue
 
-        choice = input("Choose an option: ")
-
-        if choice == "1":
+        if choice == 1:
             title = input("Enter task title: ")
             due_date = input("Enter due date: ")
-            user.add_ta(title, due_date)
+            user.add_task(title, due_date)
 
-        elif choice == "2":
-            user.list_ta()
+        elif choice == 2:
+            user.list_task()
 
-        elif choice == "3":
+        elif choice == 3:
             try:
                 number = int(input("Enter task number to mark complete: "))
-                user.comp_ta(number)
+                user.complete_task(number)
             except ValueError:
-                print("Please enter a valid number.")
+                logging.error("Please enter a valid number.")
 
-        elif choice == "4":
+        elif choice == 4:
             try:
                 number = int(input("Enter task number to delete: "))
-                user.del_ta(number)
+                user.delete_task(number)
             except ValueError:
-                print("Please enter a valid number.")
+                logging.error("Please enter a valid number.")
 
-        elif choice == "5":
-            user.save_ta()
-            print("Goodbye!")
+        elif choice == 5:
+            user.save_task()
+            logging.info("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please try again.")
+            logging.warning("Invalid choice. Please try again.")
+
 
 if __name__ == "__main__":
     main()

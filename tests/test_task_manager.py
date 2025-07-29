@@ -54,12 +54,15 @@ class TestTaskManager(unittest.TestCase):
         """
         filename = "test_tasks.json"
         self.manager.add_task("Task C", "25/7/2025")
+        self.manager.add_task("Task D", "25/8/2025")
+
         self.manager.save_task(filename)
 
         new_manager = TaskManager()
         new_manager.load_task(filename)
-        self.assertEqual(len(new_manager.tasks), 1)
+        self.assertEqual(len(new_manager.tasks), 2)
         self.assertEqual(new_manager.tasks[0].title, "Task C")
+        self.assertEqual(new_manager.tasks[1].title, "Task D")
 
         # Clean up the test file after running
         # os.remove(filename)

@@ -1,7 +1,7 @@
 import json
 import logging
 import textwrap
-
+from datetime import datetime
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
@@ -54,17 +54,31 @@ class Task:
         """
         return cls(data["title"], data["due_date"], data["status"])
 
+    
 
 class TaskManager:
     """
     Manages a list of tasks and provides methods to add, delete, list, complete, save, and load tasks.
     """
-
-    def __init__(self):
+    def __init__(self): 
         """
-        Initializes the TaskManager with an empty task list.
+        Ini0tializes the TaskManager with an empty task list.
         """
         self.tasks = []
+
+    def date_formats(self,date:str) -> str:
+        """
+        Parses the input date string using allowed formats.
+        Returns it in YYYY-MM-DD format or raises ValueError.
+        """
+        formats=["%d/%m/%Y","%d-%m-%Y"]
+        for format in formats:
+            try:
+                parsed = datetime.strptime(date, format)
+                return parsed.strftime("%Y-%m-%d")
+            except ValueError:
+                continue 
+        raise ValueError("Invalid date format.")
 
     def add_task(self, title: str, due_date: str) -> None:
         """
@@ -74,9 +88,13 @@ class TaskManager:
             title (str): The task title.
             due_date (str): The due date for the task.
         """
-        task = Task(title, due_date)
-        self.tasks.append(task)
-        logging.info(f"Task added: {title}")
+        try :
+            valid_date=self.date_formats(due_date)
+            task = Task(title, valid_date)
+            self.tasks.append(task)
+            logging.info(f"Task added: {title}")
+        except ValueError as e:
+           logging.error(str(e))    
 
     def delete_task(self, task_number: int) -> None:
         """

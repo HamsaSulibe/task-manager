@@ -29,6 +29,10 @@ class TestFunctionalFlow(unittest.TestCase):
 
         self.assertEqual(manager.tasks[0].status, "Pending")
 
+    def test_add_task_wrongfrmDate(self):
+       manager = TaskManager()
+       manager.add_task("task C", "10.10/2025")
+       self.assertEqual(len(manager.tasks), 0)
 
 if __name__ == "__main__":
     unittest.main()

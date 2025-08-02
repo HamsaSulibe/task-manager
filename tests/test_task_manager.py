@@ -38,7 +38,7 @@ class TestTaskManager(unittest.TestCase):
         """
         self.manager.add_task("Task A", "25/7/2025")
         self.manager.delete_task(1)
-        self.assertEqual(len(self.manager.tasks), 0)
+        self.assertEqual(self.manager.tasks[0].status,"Deleted")
 
     def test_complete_task(self):
         """

@@ -105,8 +105,12 @@ class TaskManager:
         """
         index = task_number - 1
         if 0 <= index < len(self.tasks):
-            removed = self.tasks.pop(index)
-            logging.info(f"Deleted task {task_number}: {removed.title}")
+            task= self.tasks[index]
+            if task.status=="Deleted":
+               logging.warning(f"Task {task_number} is already deleted.")
+               return
+            task.status = "Deleted"
+            logging.info(f"Marked task {task_number} as deleted: {task.title}")
         else:
             logging.error("Invalid task number.")
 
@@ -114,11 +118,13 @@ class TaskManager:
         """
         Lists all current tasks with their status and due dates.
         """
-        if not self.tasks:
-            logging.info("No tasks found.")
+        visible_tasks = [task for task in self.tasks if task.status != "Deleted"]
+
+        if not visible_tasks:
+               logging.info("No tasks found.")
         else:
-            for i, task in enumerate(self.tasks, 1):
-                logging.info(f"{i}. {task.title} | Due: {task.due_date} | Status: {task.status}")
+           for i, task in enumerate(visible_tasks, 1):
+               logging.info(f"{i}. {task.title} | Due: {task.due_date} | Status: {task.status}")
 
     def complete_task(self, task_number: int) -> None:
         """

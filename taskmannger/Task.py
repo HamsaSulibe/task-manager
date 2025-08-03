@@ -15,18 +15,26 @@ class Task:
         status (str): The status of the task (default is "Pending").
     """
 
-    def __init__(self, title: str, due_date: str, status="Pending") -> None:
+    def __init__(self, title: str, start_date:datetime,due_date:datetime, status="Pending") -> None:
         """
         Initializes a new Task instance.
 
         Args:
             title (str): The task title.
+            start_date:the start sate for the task
             due_date (str): The due date for the task.
             status (str, optional): The task status. Defaults to "Pending".
         """
         self.title = title
+        self.start_date=start_date
         self.due_date = due_date
         self.status = status
+
+       
+        delta=(due_date-start_date).days
+        if delta < 0 :
+            raise ValueError("Due date must be after start date")
+        self.needed_time = delta
 
     def task_look(self) -> dict[str, str]:
         """
@@ -36,9 +44,11 @@ class Task:
             dict[str, str]: A dictionary containing task details.
         """
         return {
-            "title": self.title,
-            "due_date": self.due_date,
-            "status": self.status
+        "title": self.title,
+        "start_date": self.start_date.strftime("%Y-%m-%d"),
+        "due_date": self.due_date.strftime("%Y-%m-%d"),
+        "needed_time": self.needed_time,
+        "status": self.status
         }
 
     @classmethod
@@ -52,9 +62,14 @@ class Task:
         Returns:
             Task: A Task instance.
         """
-        return cls(data["title"], data["due_date"], data["status"])
-
-    
+        start = datetime.strptime(data["start_date"], "%Y-%m-%d")
+        due = datetime.strptime(data["due_date"], "%Y-%m-%d")
+        return cls(
+        data["title"],
+        start,
+        due,
+        data.get("status", "Pending")
+         )
 
 class TaskManager:
     """
@@ -78,41 +93,45 @@ class TaskManager:
                 return parsed.strftime("%Y-%m-%d")
             except ValueError:
                 continue 
-        raise ValueError("Invalid date format.")
-
-    def add_task(self, title: str, due_date: str) -> None:
+        raise ValueError("Invalid date format.")  
+        
+    def add_task(self, title: str, start_date: str, due_date: str) -> None:
         """
         Adds a new task to the list.
-
         Args:
             title (str): The task title.
+            start_date (str): The start date.
             due_date (str): The due date for the task.
         """
-        try :
-            valid_date=self.date_formats(due_date)
-            task = Task(title, valid_date)
-            self.tasks.append(task)
-            logging.info(f"Task added: {title}")
+        try:
+           start = datetime.strptime(self.date_formats(start_date), "%Y-%m-%d")
+           due = datetime.strptime(self.date_formats(due_date), "%Y-%m-%d")
+           task = Task(title, start, due)
+           self.tasks.append(task)
+           logging.info(f"Task added: {title}")
         except ValueError as e:
-           logging.error(str(e))    
-
+           logging.error(str(e))
+  
     def delete_task(self, task_number: int) -> None:
         """
-        Deletes a task from the list by its number.
+        Deletes a task from the visible list (excluding deleted tasks).
 
         Args:
-            task_number (int): The number of the task to delete.
+            task_number (int): The number of the task (as seen by the user) to delete.
         """
+        visible_tasks = [task for task in self.tasks if task.status != "Deleted"]
+
         index = task_number - 1
-        if 0 <= index < len(self.tasks):
-            task= self.tasks[index]
-            if task.status=="Deleted":
-               logging.warning(f"Task {task_number} is already deleted.")
-               return
-            task.status = "Deleted"
-            logging.info(f"Marked task {task_number} as deleted: {task.title}")
+        if 0 <= index < len(visible_tasks):
+            task_to_delete = visible_tasks[index]
+            if task_to_delete.status == "Deleted":
+                logging.warning(f"Task {task_number} is already deleted.")
+                return
+            task_to_delete.status = "Deleted"
+            logging.info(f"Marked task {task_number} as deleted: {task_to_delete.title}")
         else:
             logging.error("Invalid task number.")
+
 
     def list_task(self) -> None:
         """
@@ -124,7 +143,7 @@ class TaskManager:
                logging.info("No tasks found.")
         else:
            for i, task in enumerate(visible_tasks, 1):
-               logging.info(f"{i}. {task.title} | Due: {task.due_date} | Status: {task.status}")
+            logging.info(f"{i}. {task.title} | Start: {task.start_date.strftime('%Y-%m-%d')} | Due: {task.due_date.strftime('%Y-%m-%d')} | Needed Time: {task.needed_time} days | Status: {task.status}")
 
     def complete_task(self, task_number: int) -> None:
         """
@@ -195,9 +214,11 @@ def main() -> None:
             continue
 
         if choice == 1:
-            title = input("Enter task title: ")
-            due_date = input("Enter due date: ")
-            user.add_task(title, due_date)
+           title = input("Enter task title: ")
+           start_date = input("Enter start date (dd/mm/yyyy or dd-mm-yyyy): ")
+           due_date = input("Enter due date (dd/mm/yyyy or dd-mm-yyyy): ")
+           user.add_task(title, start_date, due_date)
+
 
         elif choice == 2:
             user.list_task()

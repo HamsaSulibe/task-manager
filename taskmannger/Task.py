@@ -98,20 +98,30 @@ class TaskManager:
         
     def add_task(self, title: str, start_date: str, due_date: str) -> None:
         """
-        Adds a new task to the list.
-        Args:
-            title (str): The task title.
-            start_date (str): The start date.
-            due_date (str): The due date for the task.
+        Adds a new task after validating required fields.
         """
+        if not title.strip():
+            logging.error("Title is required and cannot be empty.")
+            return
+
         try:
-           start = datetime.strptime(self.date_formats(start_date), "%Y-%m-%d")
-           due = datetime.strptime(self.date_formats(due_date), "%Y-%m-%d")
-           task = Task(title, start, due)
-           self.tasks.append(task)
-           logging.info(f"Task added: {title}")
+            start_str = self.date_formats(start_date)
+            due_str   = self.date_formats(due_date)
+
+            start_dt = datetime.strptime(start_str, "%Y-%m-%d")
+            due_dt   = datetime.strptime(due_str,   "%Y-%m-%d")
+
+            needed_days = (due_dt - start_dt).days
+            if needed_days <= 0:
+                raise ValueError("Needed time must be at least one day (due_date > start_date).")
+
+            task = Task(title, start_dt, due_dt)
+            self.tasks.append(task)
+            logging.info(f"Task added: {title}")
+
         except ValueError as e:
-           logging.error(str(e))
+            logging.error(f"Invalid input: {e}")
+
   
     def delete_task(self, task_number: int) -> None:
         """

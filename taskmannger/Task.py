@@ -1,6 +1,7 @@
 import json
 import logging
 import textwrap
+import glob
 from datetime import datetime
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -158,32 +159,35 @@ class TaskManager:
             logging.info(f"Task {task_number} marked as complete.")
         else:
             logging.error("Invalid task number.")
+    
 
-    def save_task(self, filename: str = "tasks.json") -> None:
-        """
-        Saves all tasks to a JSON file.
-
-        Args:
-            filename (str, optional): The name of the file to save. Defaults to "tasks.json".
-        """
+    def save_task(self) -> None:
+        json_files = glob.glob("*.json")
+        if json_files:
+            print("Available JSON files:")
+            for f in json_files:
+                print(f" - {f}")
+        filename = input("Enter filename to save to : ").strip() or "tasks.json"
         with open(filename, "w") as file:
             json.dump([task.task_look() for task in self.tasks], file)
-        logging.info("Tasks saved successfully.")
+        logging.info(f"Tasks saved successfully to {filename}.")
 
-    def load_task(self, filename: str = "tasks.json") -> None:
-        """
-        Loads tasks from a JSON file if it exists.
 
-        Args:
-            filename (str, optional): The name of the file to load. Defaults to "tasks.json".
-        """
+    def load_task(self) -> None:
+        json_files = glob.glob("*.json")
+        if json_files:
+            print("Available JSON files:")
+            for f in json_files:
+                print(f" - {f}")
+        filename = input("Enter filename to load from (press Enter for tasks.json): ").strip() or "tasks.json"
         try:
             with open(filename, "r") as file:
                 data = json.load(file)
                 self.tasks = [Task.from_json(task) for task in data]
+            logging.info(f"Tasks loaded successfully from {filename}.")
         except FileNotFoundError:
             self.tasks = []
-            logging.warning("No existing task file found. Starting with empty list.")
+            logging.warning(f"No task file found: {filename}. Starting with empty list.")
         except json.JSONDecodeError:
             logging.error("Error: Couldn't load tasks.")
 
@@ -238,9 +242,10 @@ def main() -> None:
                 logging.error("Please enter a valid number.")
 
         elif choice == 5:
-            user.save_task()
-            logging.info("Goodbye!")
-            break
+                user.save_task()
+                logging.info("Goodbye!")
+                break
+
 
         else:
             logging.warning("Invalid choice. Please try again.")

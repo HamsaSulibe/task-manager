@@ -12,7 +12,8 @@ class Task:
 
     Attributes:
         title (str): The title of the task.
-        due_date (str): The due date of the task.
+        start_date(datetime):the start date of the task
+        due_date (datetime): The due date of the task.
         status (str): The status of the task (default is "Pending").
     """
 
@@ -22,8 +23,8 @@ class Task:
 
         Args:
             title (str): The task title.
-            start_date:the start sate for the task
-            due_date (str): The due date for the task.
+            start_date(datetime):the start sate for the task
+            due_date (datetime): The due date for the task.
             status (str, optional): The task status. Defaults to "Pending".
         """
         self.title = title
@@ -78,7 +79,7 @@ class TaskManager:
     """
     def __init__(self): 
         """
-        Ini0tializes the TaskManager with an empty task list.
+        Iniotializes the TaskManager with an empty task list.
         """
         self.tasks = []
 
@@ -171,25 +172,29 @@ class TaskManager:
             logging.error("Invalid task number.")
     
 
-    def save_task(self) -> None:
-        json_files = glob.glob("*.json")
-        if json_files:
-            print("Available JSON files:")
-            for f in json_files:
-                print(f" - {f}")
-        filename = input("Enter filename to save to : ").strip() or "tasks.json"
+    def save_task(self, filename=None) -> None:
+        if not filename:
+            json_files = glob.glob("*.json")
+            if json_files:
+                print("Available JSON files:")
+                for f in json_files:
+                    print(f" - {f}")
+            filename = input("Enter filename to save to: ").strip() or "tasks.json"
+
         with open(filename, "w") as file:
             json.dump([task.task_look() for task in self.tasks], file)
         logging.info(f"Tasks saved successfully to {filename}.")
 
 
-    def load_task(self) -> None:
-        json_files = glob.glob("*.json")
-        if json_files:
-            print("Available JSON files:")
-            for f in json_files:
-                print(f" - {f}")
-        filename = input("Enter filename to load from (press Enter for tasks.json): ").strip() or "tasks.json"
+    def load_task(self, filename=None) -> None:
+        if not filename:
+            json_files = glob.glob("*.json")
+            if json_files:
+                print("Available JSON files:")
+                for f in json_files:
+                    print(f" - {f}")
+            filename = input("Enter filename to load from (press Enter for tasks.json): ").strip() or "tasks.json"
+
         try:
             with open(filename, "r") as file:
                 data = json.load(file)
@@ -200,7 +205,6 @@ class TaskManager:
             logging.warning(f"No task file found: {filename}. Starting with empty list.")
         except json.JSONDecodeError:
             logging.error("Error: Couldn't load tasks.")
-
 
 def main() -> None:
     """

@@ -17,7 +17,6 @@ class TestTaskManager(unittest.TestCase):
     - Saving and loading tasks from a JSON file
     -loading from nonexistent file
     """
-
     def setUp(self):
         """
         Runs before each test.
@@ -42,6 +41,10 @@ class TestTaskManager(unittest.TestCase):
         self.assertEqual(len(self.manager.tasks), 1)
         self.assertEqual(self.manager.tasks[0].title, "Test Task")
     
+    def test_add_task_no_title(self):
+        manager = TaskManager()
+        manager.add_task("", "01/01/2025", "12/12/2025")
+        self.assertEqual(len(manager.tasks), 0)
     def test_delete_task(self):
         """
         Test that a task is deleted properly using its number.

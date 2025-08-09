@@ -5,10 +5,9 @@ import glob
 from datetime import datetime
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-
 class Task:
     """
-    Represents a task with a title, due date, and status.
+    Represents a task with a title, start date,due date, and status.
 
     Attributes:
         title (str): The title of the task.
@@ -159,15 +158,13 @@ class TaskManager:
 
     def complete_task(self, task_number: int) -> None:
         """
-        Marks a task as complete.
-
-        Args:
-            task_number (int): The number of the task to mark as done.
-        """
+        Marks a task as complete.        """
+        visible_tasks=[ task for task in self.tasks if task.status!="Deleted"]
         index = task_number - 1
-        if 0 <= index < len(self.tasks):
-            self.tasks[index].status = "Done"
-            logging.info(f"Task {task_number} marked as complete.")
+        if 0 <= index < len(visible_tasks):
+            task_to_complete = visible_tasks[index]
+            task_to_complete.status = "Done"
+            logging.info(f"Marked task {task_number} as complete: {task_to_complete.title}")
         else:
             logging.error("Invalid task number.")
     

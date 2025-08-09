@@ -1,3 +1,4 @@
+from datetime import datetime
 import unittest
 import os
 import sys
@@ -15,7 +16,7 @@ class TestIntegrationFlow(unittest.TestCase):
   filename="integration_test.json"
 
   manager=TaskManager()
-  manager.add_task("task A","25/5/2025")
+  manager.add_task("task A","2/2/2025","25/5/2025")
   manager.save_task(filename)
 
   new_manager=TaskManager()
@@ -24,7 +25,8 @@ class TestIntegrationFlow(unittest.TestCase):
 
   self.assertEqual(len(new_manager.tasks),1)
   self.assertEqual(new_manager.tasks[0].title,"task A")
-  self.assertEqual(new_manager.tasks[0].due_date, "25/5/2025")
+  self.assertEqual(new_manager.tasks[0].start_date,datetime(2025,2,2))
+  self.assertEqual(new_manager.tasks[0].due_date,datetime(2025,5,25))
   self.assertEqual(new_manager.tasks[0].status, "Pending")
 
         

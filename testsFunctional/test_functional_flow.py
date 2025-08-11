@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from taskmannger.Task import TaskManager
+from taskmannger.Task import DELETED_STATE, DONE_STATE, TaskManager
 
 class TestFunctionalFlow(unittest.TestCase):
     """
@@ -24,7 +24,7 @@ class TestFunctionalFlow(unittest.TestCase):
 
         self.assertEqual(len(manager.tasks), 1)
         self.assertEqual(manager.tasks[0].title, "task A")
-        self.assertEqual(manager.tasks[0].status, "Done")
+        self.assertEqual(manager.tasks[0].status, DONE_STATE)
 
     def test_add_and_delete_task(self):
         """
@@ -35,9 +35,9 @@ class TestFunctionalFlow(unittest.TestCase):
         self.assertEqual(len(manager.tasks), 1)
 
         manager.delete_task(1)
-        self.assertEqual(manager.tasks[0].status, "Deleted")
+        self.assertEqual(manager.tasks[0].status, DELETED_STATE)
 
-        visible = [t for t in manager.tasks if t.status != "Deleted"]
+        visible = [t for t in manager.tasks if t.status !=DELETED_STATE]
         self.assertEqual(len(visible), 0)
 
     def test_add_list_and_complete_task(self):
@@ -54,7 +54,7 @@ class TestFunctionalFlow(unittest.TestCase):
 
         self.assertEqual(len(manager.tasks), 1)
         self.assertEqual(manager.tasks[0].title, "task E")
-        self.assertEqual(manager.tasks[0].status, "Done")
+        self.assertEqual(manager.tasks[0].status, DONE_STATE)
 
 
 if __name__ == "__main__":

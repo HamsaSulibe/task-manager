@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from taskmannger.Task import Task, TaskManager
+from taskmannger.Task import DELETED_STATE, DONE_STATE, Task, TaskManager
 
 class TestTaskManager(unittest.TestCase):
     """
@@ -43,15 +43,16 @@ class TestTaskManager(unittest.TestCase):
     
     def test_add_task_no_title(self):
         manager = TaskManager()
-        manager.add_task("", "01/01/2025", "12/12/2025")
-        self.assertEqual(len(manager.tasks), 0)
+        with self.assertRaises(AssertionError):
+           manager.add_task("", "01/01/2025", "12/12/2025")
+        
     def test_delete_task(self):
         """
         Test that a task is deleted properly using its number.
         """
         self.manager.add_task("Task A", "24/7/2025", "25/7/2025")
         self.manager.delete_task(1)
-        self.assertEqual(self.manager.tasks[0].status,"Deleted")
+        self.assertEqual(self.manager.tasks[0].status,DELETED_STATE)
 
     def test_complete_task(self):
         """
@@ -59,7 +60,7 @@ class TestTaskManager(unittest.TestCase):
         """
         self.manager.add_task("Task B", "24/7/2025", "26/7/2025")
         self.manager.complete_task(1)
-        self.assertEqual(self.manager.tasks[0].status, "Done")
+        self.assertEqual(self.manager.tasks[0].status, DONE_STATE)
 
     def test_save_and_load_task(self):
         """

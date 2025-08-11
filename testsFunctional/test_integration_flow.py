@@ -4,7 +4,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from taskmannger.Task import TaskManager
+from taskmannger.Task import PENDING_STATE, TaskManager
 
 
 class TestIntegrationFlow(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestIntegrationFlow(unittest.TestCase):
   self.assertEqual(new_manager.tasks[0].title,"task A")
   self.assertEqual(new_manager.tasks[0].start_date,datetime(2025,2,2))
   self.assertEqual(new_manager.tasks[0].due_date,datetime(2025,5,25))
-  self.assertEqual(new_manager.tasks[0].status, "Pending")
+  self.assertEqual(new_manager.tasks[0].status, PENDING_STATE)
 
         
   os.remove(filename)

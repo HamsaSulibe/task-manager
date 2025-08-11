@@ -5,6 +5,10 @@ import glob
 from datetime import datetime
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
+PENDING_STATE = "Pending"
+DELETED_STATE = "Deleted"
+DONE_STATE = "Done"
+
 class Task:
     """
     Represents a task with a title, start date,due date, and status.
@@ -16,7 +20,7 @@ class Task:
         status (str): The status of the task (default is "Pending").
     """
 
-    def __init__(self, title: str, start_date:datetime,due_date:datetime, status="Pending") -> None:
+    def __init__(self, title: str, start_date:datetime,due_date:datetime, status=PENDING_STATE) -> None:
         """
         Initializes a new Task instance.
 
@@ -32,7 +36,7 @@ class Task:
         self.status = status
 
        
-        delta=(due_date-start_date).days
+        delta=(due_date - start_date).days
         if delta < 0 :
             raise ValueError("Due date must be after start date")
         self.needed_time = delta
@@ -69,7 +73,7 @@ class Task:
         data["title"],
         start,
         due,
-        data.get("status", "Pending")
+        data.get("status", PENDING_STATE)
          )
 
 class TaskManager:
@@ -87,7 +91,7 @@ class TaskManager:
         Parses the input date string using allowed formats.
         Returns it in YYYY-MM-DD format or raises ValueError.
         """
-        formats=["%d/%m/%Y","%d-%m-%Y"]
+        formats = ["%d/%m/%Y", "%d-%m-%Y"]
         for format in formats:
             try:
                 parsed = datetime.strptime(date, format)
@@ -100,9 +104,7 @@ class TaskManager:
         """
         Adds a new task after validating required fields.
         """
-        if not title.strip():
-            logging.error("Title is required and cannot be empty.")
-            return
+        assert title.strip(),"title is reuired and cannot be empty"
 
         try:
             start_str = self.date_formats(start_date)
@@ -130,15 +132,15 @@ class TaskManager:
         Args:
             task_number (int): The number of the task (as seen by the user) to delete.
         """
-        visible_tasks = [task for task in self.tasks if task.status != "Deleted"]
+        visible_tasks = [task for task in self.tasks if task.status != DELETED_STATE]
 
         index = task_number - 1
         if 0 <= index < len(visible_tasks):
             task_to_delete = visible_tasks[index]
-            if task_to_delete.status == "Deleted":
+            if task_to_delete.status ==DELETED_STATE:
                 logging.warning(f"Task {task_number} is already deleted.")
                 return
-            task_to_delete.status = "Deleted"
+            task_to_delete.status = DELETED_STATE
             logging.info(f"Marked task {task_number} as deleted: {task_to_delete.title}")
         else:
             logging.error("Invalid task number.")
@@ -148,7 +150,7 @@ class TaskManager:
         """
         Lists all current tasks with their status and due dates.
         """
-        visible_tasks = [task for task in self.tasks if task.status != "Deleted"]
+        visible_tasks = [task for task in self.tasks if task.status !=DELETED_STATE]
 
         if not visible_tasks:
                logging.info("No tasks found.")
@@ -159,11 +161,11 @@ class TaskManager:
     def complete_task(self, task_number: int) -> None:
         """
         Marks a task as complete.        """
-        visible_tasks=[ task for task in self.tasks if task.status!="Deleted"]
+        visible_tasks=[ task for task in self.tasks if task.status!=DELETED_STATE]
         index = task_number - 1
         if 0 <= index < len(visible_tasks):
             task_to_complete = visible_tasks[index]
-            task_to_complete.status = "Done"
+            task_to_complete.status = DONE_STATE
             logging.info(f"Marked task {task_number} as complete: {task_to_complete.title}")
         else:
             logging.error("Invalid task number.")

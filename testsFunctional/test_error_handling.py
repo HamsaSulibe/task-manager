@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from taskmannger.Task import TaskManager
+from taskmannger.Task import PENDING_STATE,DELETED_STATE, TaskManager
 
 class TestNegativeFlow(unittest.TestCase):
     """
@@ -16,7 +16,7 @@ class TestNegativeFlow(unittest.TestCase):
         self.assertEqual(len(manager.tasks), 1)
         # Expect no exception, just no change
         manager.delete_task(4)
-        visible_tasks = [t for t in manager.tasks if t.status != "Deleted"]
+        visible_tasks = [t for t in manager.tasks if t.status != DELETED_STATE]
         self.assertEqual(len(visible_tasks), 1)
         self.assertEqual(visible_tasks[0].title, "task A")
 
@@ -27,7 +27,18 @@ class TestNegativeFlow(unittest.TestCase):
 
         manager.complete_task(3)
 
-        self.assertEqual(manager.tasks[0].status, "Pending")
+        self.assertEqual(manager.tasks[0].status, PENDING_STATE)
+
+    def test_two_digit_year(self):
+        manager=TaskManager()
+        manager.add_task("task C", "01/01/25", "12/12/25")
+        self.assertEqual(len(manager.tasks), 0)
+
+    def test_add_wrong_format(self):
+        m = TaskManager()
+        m.add_task("mixed", "10/08-2025", "12/08-2025")
+        self.assertEqual(len(m.tasks), 0)
+
 
     def test_add_task_wrongfrmDate(self):
        manager = TaskManager()
@@ -45,7 +56,7 @@ class TestNegativeFlow(unittest.TestCase):
         manager.delete_task(1)
         manager.delete_task(1)  
 
-        deleted_count = len([t for t in manager.tasks if t.status == "Deleted"])
+        deleted_count = len([t for t in manager.tasks if t.status == DELETED_STATE])
         self.assertEqual(deleted_count, 1)  
 
     def test_valid_date_format(self):

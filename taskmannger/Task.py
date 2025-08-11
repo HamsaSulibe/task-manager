@@ -78,7 +78,7 @@ class TaskManager:
     """
     def __init__(self): 
         """
-        Iniotializes the TaskManager with an empty task list.
+        Initializes the TaskManager with an empty task list.
         """
         self.tasks = []
 
@@ -170,6 +170,10 @@ class TaskManager:
     
 
     def save_task(self, filename=None) -> None:
+        """ 
+        Saves the current tasks to a JSON file.
+        If filename is not provided, prompts the user for one.
+     """
         if not filename:
             json_files = glob.glob("*.json")
             if json_files:
@@ -177,13 +181,20 @@ class TaskManager:
                 for f in json_files:
                     print(f" - {f}")
             filename = input("Enter filename to save to: ").strip() or "tasks.json"
-
-        with open(filename, "w") as file:
-            json.dump([task.task_look() for task in self.tasks], file)
-        logging.info(f"Tasks saved successfully to {filename}.")
-
+        try:
+         with open(filename, "w") as file:
+             json.dump([task.task_look() for task in self.tasks], file)
+         logging.info(f"Tasks saved successfully to {filename}.")
+        except PermissionError:
+            logging.warning(f"Permission denied when saving to {filename}. Tasks NOT saved.")
+        except OSError as e:
+            logging.error(f"OS error while saving to {filename}: {e}")
+    
 
     def load_task(self, filename=None) -> None:
+        """
+    Loads tasks from a JSON file.
+    """
         if not filename:
             json_files = glob.glob("*.json")
             if json_files:
@@ -194,14 +205,27 @@ class TaskManager:
 
         try:
             with open(filename, "r") as file:
-                data = json.load(file)
-                self.tasks = [Task.from_json(task) for task in data]
+                raw=json.load(file)
+                
+            loaded=[]
+            for idx,item in enumerate(raw):
+                try:
+                    loaded.append(Task.from_json(item))
+                except(KeyError,ValueError)as e:
+                    logging.warning(f"Skipping invalid task at index {idx}: {e}")
+            self.tasks = loaded
             logging.info(f"Tasks loaded successfully from {filename}.")
         except FileNotFoundError:
             self.tasks = []
             logging.warning(f"No task file found: {filename}. Starting with empty list.")
         except json.JSONDecodeError:
-            logging.error("Error: Couldn't load tasks.")
+            self.tasks = []
+            logging.error(f"Corrupted JSON in {filename}. Starting with empty list.")
+        except PermissionError:
+            logging.warning(f"Permission denied when reading {filename}. Keeping current tasks.")
+        except OSError as e:
+            logging.error(f"OS error while loading {filename}: {e}")
+
 
 def main() -> None:
     """

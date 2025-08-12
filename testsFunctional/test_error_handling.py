@@ -1,9 +1,15 @@
-import unittest
 import os
 import sys
+import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from taskmannger.Task import PENDING_STATE,DELETED_STATE, TaskManager
+
+sys.path.insert(
+    0,
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+)
+
+from taskmannger.Task import PENDING_STATE, DELETED_STATE, TaskManager
+
 
 class TestNegativeFlow(unittest.TestCase):
     """
@@ -30,7 +36,7 @@ class TestNegativeFlow(unittest.TestCase):
         self.assertEqual(manager.tasks[0].status, PENDING_STATE)
 
     def test_two_digit_year(self):
-        manager=TaskManager()
+        manager = TaskManager()
         manager.add_task("task C", "01/01/25", "12/12/25")
         self.assertEqual(len(manager.tasks), 0)
 
@@ -39,12 +45,11 @@ class TestNegativeFlow(unittest.TestCase):
         m.add_task("mixed", "10/08-2025", "12/08-2025")
         self.assertEqual(len(m.tasks), 0)
 
-
     def test_add_task_wrongfrmDate(self):
-       manager = TaskManager()
-       manager.add_task("task C", "10.10/2025", "12/12/2025")
-       self.assertEqual(len(manager.tasks), 0)
-    
+        manager = TaskManager()
+        manager.add_task("task C", "10.10/2025", "12/12/2025")
+        self.assertEqual(len(manager.tasks), 0)
+
     def test_add_task_due_before_start(self):
         manager = TaskManager()
         manager.add_task("Invalid task", "15/12/2025", "01/01/2025")
@@ -54,10 +59,10 @@ class TestNegativeFlow(unittest.TestCase):
         manager = TaskManager()
         manager.add_task("task E", "01/01/2025", "05/01/2025")
         manager.delete_task(1)
-        manager.delete_task(1)  
+        manager.delete_task(1)
 
         deleted_count = len([t for t in manager.tasks if t.status == DELETED_STATE])
-        self.assertEqual(deleted_count, 1)  
+        self.assertEqual(deleted_count, 1)
 
     def test_valid_date_format(self):
         manager = TaskManager()
@@ -69,13 +74,11 @@ class TestNegativeFlow(unittest.TestCase):
         manager = TaskManager()
         manager.add_task("Bad Date Format", "2025-08-10", "2025-08-11")  # wrong format
         self.assertEqual(len(manager.tasks), 0)
-        
+
     def test_nondate_string_task(self):
-        manager=TaskManager()
-        manager.add_task("task a ","12/12/2025","tomowro")
-        self.assertEqual(len(manager.tasks),0)
-        
-   
+        manager = TaskManager()
+        manager.add_task("task a ", "12/12/2025", "tomowro")
+        self.assertEqual(len(manager.tasks), 0)
 
 
 if __name__ == "__main__":

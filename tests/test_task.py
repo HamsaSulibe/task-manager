@@ -1,16 +1,23 @@
-import sys
 import os
+import sys
 from datetime import datetime
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import unittest
+
+
+sys.path.insert(
+    0,
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+)
 
 from taskmannger.Task import PENDING_STATE, DONE_STATE, Task
-import unittest
+
 
 class TestTask(unittest.TestCase):
     """
     Unit tests for the Task class.
     Each test checks a specific feature of the Task object.
     """
+
     def test_create_task(self):
         """
         Test creating a Task with default status and correct needed_time calculation.
@@ -54,7 +61,7 @@ class TestTask(unittest.TestCase):
             "start_date": "2025-07-24",
             "due_date": "2025-07-26",
             "needed_time": 2,
-            "status": PENDING_STATE
+            "status": PENDING_STATE,
         }
         self.assertEqual(task.task_look(), expected)
 
@@ -66,7 +73,7 @@ class TestTask(unittest.TestCase):
             "title": "Clean room",
             "start_date": "2025-07-24",
             "due_date": "2025-07-26",
-            "status": DONE_STATE
+            "status": DONE_STATE,
         }
         task = Task.from_json(data)
         self.assertEqual(task.title, "Clean room")
@@ -74,6 +81,7 @@ class TestTask(unittest.TestCase):
         self.assertEqual(task.due_date.strftime("%Y-%m-%d"), "2025-07-26")
         self.assertEqual(task.status, DONE_STATE)
         self.assertEqual(task.needed_time, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

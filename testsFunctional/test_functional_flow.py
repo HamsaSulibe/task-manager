@@ -1,13 +1,20 @@
-import unittest
 import os
 import sys
+import unittest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.insert(
+    0,
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+)
+
 from taskmannger.Task import DELETED_STATE, DONE_STATE, TaskManager
+
 
 class TestFunctionalFlow(unittest.TestCase):
     """
-    Functional tests for full task manager scenarios:
+    Functional tests for full task manager scenarios.
+
     These tests simulate user actions in memory (no file I/O):
     - Add and complete
     - Add and delete
@@ -19,7 +26,7 @@ class TestFunctionalFlow(unittest.TestCase):
         Scenario: Add a task, complete it, verify it's done.
         """
         manager = TaskManager()
-        manager.add_task("task A", "1/5/2025","5/5/2026")
+        manager.add_task("task A", "1/5/2025", "5/5/2026")
         manager.complete_task(1)
 
         self.assertEqual(len(manager.tasks), 1)
@@ -37,7 +44,7 @@ class TestFunctionalFlow(unittest.TestCase):
         manager.delete_task(1)
         self.assertEqual(manager.tasks[0].status, DELETED_STATE)
 
-        visible = [t for t in manager.tasks if t.status !=DELETED_STATE]
+        visible = [t for t in manager.tasks if t.status != DELETED_STATE]
         self.assertEqual(len(visible), 0)
 
     def test_add_list_and_complete_task(self):
@@ -45,8 +52,8 @@ class TestFunctionalFlow(unittest.TestCase):
         Scenario: Add a task, list it (simulate viewing), then complete it.
         """
         manager = TaskManager()
-        manager.add_task("task E","12/1/2025","12/12/2025")
-        
+        manager.add_task("task E", "12/1/2025", "12/12/2025")
+
         # Just simulate viewing tasks
         manager.list_task()
 
